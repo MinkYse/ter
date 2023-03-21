@@ -5,12 +5,12 @@ variable "token" {
 
 variable "folder_id" {
   description = "Yandex Cloud Folder ID where resources will be created"
-  default     = "enter your folder id"
+  default     = "b1g1g4l9akhu68n2163n"
 }
 
 variable "cloud_id" {
   description = "Yandex Cloud ID where resources will be created"
-  default     = "there is cloud id"
+  default     = "b1ghtbh1p64hufs4ldep"
 }
 
 variable "public_key_path" {

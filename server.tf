@@ -1,7 +1,3 @@
-data "yandex_compute_image" "ubuntu-20-04" {
-  family = "ubuntu-2004-lts"
-}
-
 data "template_file" "cloud_init" {
   template = file("cloud-init.tmpl.yaml")
   vars = {
@@ -10,27 +6,27 @@ data "template_file" "cloud_init" {
   }
 }
 
-resource "yandex_compute_instance" "xrdp-vm" {
-  name = "xrdp"
+resource "yandex_compute_instance" "openvpn" {
+  name = "openvpn"
   folder_id = var.folder_id
   platform_id = "standard-v2"
   zone = "ru-central1-a"
 
   resources {
     cores = 4
-    memory = 8
+    memory = 4
 
   }
   boot_disk {
     mode = "READ_WRITE"
     initialize_params {
-      image_id = data.yandex_compute_image.ubuntu-20-04.id
+      image_id = "fd80o2eikcn22b229tsa"
       type = "network-ssd"
       size = 100
     }
   }
   network_interface {
-    subnet_id = yandex_vpc_subnet.xrdp-subnet-a.id
+    subnet_id = yandex_vpc_subnet.test-vpc-subpet.id
     nat = true
   }
 
@@ -43,12 +39,7 @@ resource "yandex_compute_instance" "xrdp-vm" {
     inline = [
       "echo '${var.user}:${var.xrdp_password}' | sudo chpasswd",
       "sudo apt-get update",
-      "sudo apt-get install xrdp -y",
-      "sudo systemctl enable xrdp",
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install ubuntu-desktop -y",
-      "sudo ufw allow 3389/tcp",
-      "sudo /etc/xrdp/startwm.sh",
-      "sudo /etc/init.d/xrdp restart"
+      "sudo docker run --cap-add=NET_ADMIN -it -p 1194:1194/udp -p 80:8080/tcp -e HOST_ADDR=$(curl -s https://api.ipify.org) alekslitvinenk/openvpn"
     ]
     connection {
       type = "ssh"
